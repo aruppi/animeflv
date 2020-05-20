@@ -1,8 +1,8 @@
 const cheerio = require('cheerio');
 const cheerioTableparser = require('cheerio-tableparser');
 const cloudscraper = require('cloudscraper');
-const decodeURL = require('urldecode')
-const {MergeRecursive , urlify , decodeZippyURL , imageUrlToBase64} = require('../utils/index');
+const decodeURL = require('urldecode');
+const {urlify , decodeZippyURL , imageUrlToBase64} = require('../utils/index');
 const {
   BASE_URL         , SEARCH_URL             , BROWSE_URL , 
   ANIME_VIDEO_URL  , BASE_EPISODE_IMG_URL   , 
@@ -24,6 +24,7 @@ const animeExtraInfo = async(title) =>{
   
   body.map(doc =>{
     promises.push({
+      malid: doc.mal_id,
       titleJapanese: doc.title_japanese,
       source: doc.source,
       totalEpisodes: doc.episodes,
@@ -97,7 +98,7 @@ const downloadLinksByEpsId = async(id) =>{
           urls[key].url = zippyMP4
         }
       }
-   }
+    }
 
   }catch(err){
     console.log(err);
@@ -560,7 +561,7 @@ const animeEpisodesHandler = async(id) =>{
       const contents = $script.html();
       if((contents || '').includes('var anime_info = [')) {
         let anime_info = contents.split('var anime_info = ')[1].split(';')[0];
-        let dat_anime_info = JSON.parse(anime_info);
+        let dat_anime_info = JSON.parse(JSON.stringify(anime_info));//JSON.parse(anime_info);
         anime_info_ids.push(dat_anime_info);
       }
       if((contents || '').includes('var episodes = [')) {
@@ -600,11 +601,6 @@ const animeEpisodesHandler = async(id) =>{
     console.error(err)
   }
 };
-
-//getAnimeInfo('anime/5226/tokyo-ghoul' , 'Tokyo Ghoul')
-//  .then(doc =>{
-//    console.log(JSON.stringify(doc , null , 2));
-//})
 
 const getAnimeServers = async(id) =>{
   const res = await cloudscraper(`${ANIME_VIDEO_URL}${id}` , {method: 'GET'});

@@ -5,8 +5,10 @@ const router = express.Router();
 
 router.get('/', (req, res) => {
   res.json({
-    message: 'animeflv API - 👋🌎🌍🌏',
-    author: 'Chris Michael',
+    message: 'AnimeFLV API - 🎏',
+    author: 'Jéluchu',
+    version: '1.0.6',
+    credits: 'For the firs author Chris Michael, who has stopped maintaining it',
     entries: [
       {
         'LatestAnimeAdded': '/api/v1/LatestAnimeAdded',

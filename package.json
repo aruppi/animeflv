@@ -1,6 +1,6 @@
 {
   "name": "animeflv",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Animeflv is a custom API that has the entire catalog of the animeflv.net website. You can enjoy all the content with subtitles in Spanish and the latest in the world of anime for free.",
   "main": "./src/api/api.js",
   "scripts": {
@@ -18,12 +18,13 @@
     "anime api"
   ],
   "author": {
-    "name": "Chris Michael",
-    "email": "chrisperezsantiago1@gmail.com",
-    "url": "http://personal-porfolio.chrismichael.now.sh",
+    "name": "Jéluchu",
+    "email": "infoaruppi@gmail.com",
+    "reason": "Android Developer and Others",
+    "url": "https://jeluchu.github.io/",
     "social": {
-      "github": "https://github.com/ChrisMichaelPerezSantiago",
-      "twitter": "https://twitter.com/Chris5855M"
+      "github": "https://github.com/Jeluchu",
+      "twitter": "https://twitter.com/Jeluchu"
     }
   },
   "contributors": [
@@ -31,6 +32,11 @@
       "name": "Chris Michael",
       "url": "https://github.com/ChrisMichaelPerezSantiago",
       "reason": "Project Leader, and Developer"
+    },
+    {
+      "name": "Darkangeel",
+      "url": "https://github.com/Darkangeel-hd",
+      "reason": "System administration authority (SYSADM)"
     }
   ],
   "engines": {
@@ -58,25 +64,25 @@
     "cors": "^2.8.5",
     "dotenv": "^6.2.0",
     "express": "^4.16.4",
-    "helmet": "^3.15.0",
-    "image-to-base64": "^2.0.1",
-    "morgan": "^1.9.1",
+    "helmet": "^3.22.0",
+    "image-to-base64": "^2.1.0",
+    "morgan": "^1.10.0",
     "node-fetch": "^2.6.0",
-    "npm": "^6.13.7",
+    "npm": "^6.14.5",
     "request": "^2.88.0",
     "urldecode": "^1.0.1",
-    "zs-extract": "^1.0.6"
+    "zs-extract": "^1.0.8"
   },
   "devDependencies": {
-    "apidoc": "^0.20.0",
+    "apidoc": "^0.20.1",
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
     "eslint": "^5.12.0",
     "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-plugin-import": "^2.14.0",
-    "mocha": "^5.2.0",
-    "nodemon": "^1.18.9",
-    "snyk": "^1.239.0",
+    "eslint-plugin-import": "^2.20.2",
+    "mocha": "^7.1.2",
+    "nodemon": "^2.0.3",
+    "snyk": "^1.320.2",
     "supertest": "^3.3.0"
   }
 }
