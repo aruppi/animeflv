@@ -570,8 +570,8 @@ const animeEpisodesHandler = async(id) =>{
         anime_eps_data.push(eps_data);
       }
     });
-    const AnimeThumbnailsId = anime_info_ids[0][0];
-    const animeId = anime_info_ids[0][2];
+    const AnimeThumbnailsId = anime_info_ids[0].split(',')[0].split('"')[1];
+    const animeId = anime_info_ids[0].split(',')[2].split("]")[0].split('"')[1];
     let nextEpisodeDate = anime_info_ids[0][3] || null
     const amimeTempList = [];
     for(const [key , value] of Object.entries(anime_eps_data)){
