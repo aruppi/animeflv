@@ -276,134 +276,163 @@ const animeByState = async(state , order , page ) => {
 };
 
 const tv = async(order , page) => {
-  const res = await cloudscraper(`${BROWSE_URL}type%5B%5D=tv&order=${order}&page=${page}` , {method: 'GET'});
-  const body = await res;
-  const $ = cheerio.load(body);
-  const promises = [];
 
-  $('div.Container ul.ListAnimes li article').each((index , element) =>{
-    const $element = $(element);
-    const id = $element.find('div.Description a.Button').attr('href').slice(1);
-    const title = $element.find('a h3').text();
-    const poster = $element.find('a div.Image figure img').attr('src');
-    const banner = poster.replace('covers' , 'banners').trim();
-    const type = $element.find('div.Description p span.Type').text();
-    const synopsis = $element.find('div.Description p').eq(1).text().trim();
-    const rating = $element.find('div.Description p span.Vts').text();
-    const debut = $element.find('a span.Estreno').text().toLowerCase();
-    promises.push(animeEpisodesHandler(id).then(async extra => ({
-      id: id || null,
-      title: title || null,
-      //id: id || null,
-      poster: await imageUrlToBase64(poster) || null,
-      banner: banner || null,
-      synopsis: synopsis || null,
-      debut: extra.animeExtraInfo[0].debut || null,
-      type: type || null,
-      rating: rating || null,
-      genres: extra.genres || null,
-      episodes: extra.listByEps || null
-    })))
-  })
+  let promises = [];
+
+  do {
+    const res = await cloudscraper(`${BROWSE_URL}type%5B%5D=tv&order=${order}&page=${page}` , {method: 'GET'});
+    const body = await res;
+    const $ = cheerio.load(body);
+
+    $('div.Container ul.ListAnimes li article').each((index , element) =>{
+      const $element = $(element);
+      const id = $element.find('div.Description a.Button').attr('href').slice(1);
+      const title = $element.find('a h3').text();
+      const poster = $element.find('a div.Image figure img').attr('src');
+      const banner = poster.replace('covers' , 'banners').trim();
+      const type = $element.find('div.Description p span.Type').text();
+      const synopsis = $element.find('div.Description p').eq(1).text().trim();
+      const rating = $element.find('div.Description p span.Vts').text();
+
+      promises.push(animeEpisodesHandler(id).then(async extra => ({
+        id: id || null,
+        title: title || null,
+        poster: await imageUrlToBase64(poster) || null,
+        banner: banner || null,
+        synopsis: synopsis || null,
+        debut: extra.animeExtraInfo[0].debut || null,
+        type: type || null,
+        rating: rating || null,
+        genres: extra.genres || null,
+        episodes: extra.listByEps || null
+      })))
+
+    })
+
+  } while (promises.length === 0)
+
+
   return Promise.all(promises);
 };
 
 const ova = async(order , page ) => {
-  const res = await cloudscraper(`${BROWSE_URL}type%5B%5D=ova&order=${order}&page=${page}` , {method: 'GET'});
-  const body = await res;
-  const $ = cheerio.load(body);
-  const promises = [];
 
-  $('div.Container ul.ListAnimes li article').each((index , element) =>{
-    const $element = $(element);
-    const id = $element.find('div.Description a.Button').attr('href').slice(1);
-    const title = $element.find('a h3').text();
-    const poster = $element.find('a div.Image.fa-play-circle-o figure img').attr('src');
-    const banner = poster.replace('covers' , 'banners').trim();
-    const type = $element.find('div.Description p span.Type').text();
-    const synopsis = $element.find('div.Description p').eq(1).text().trim();
-    const rating = $element.find('div.Description p span.Vts').text();
-    const debut = $element.find('a span.Estreno').text().toLowerCase();
-    promises.push(animeEpisodesHandler(id).then(async extra => ({
-      id: id || null,
-      title: title || null,
-      //id: id || null,
-      poster: await imageUrlToBase64(poster) || null,
-      banner: banner || null,
-      synopsis: synopsis || null,
-      debut: extra.animeExtraInfo[0].debut || null,
-      type: type || null,
-      rating: rating || null,
-      genres: extra.genres || null,
-      episodes: extra.listByEps || null
-    })))
-  })
+  let promises = [];
+
+  do {
+
+    const res = await cloudscraper(`${BROWSE_URL}type%5B%5D=ova&order=${order}&page=${page}` , {method: 'GET'});
+    const body = await res;
+    const $ = cheerio.load(body);
+
+    $('div.Container ul.ListAnimes li article').each((index , element) =>{
+      const $element = $(element);
+      const id = $element.find('div.Description a.Button').attr('href').slice(1);
+      const title = $element.find('a h3').text();
+      const poster = $element.find('a div.Image.fa-play-circle-o figure img').attr('src');
+      const banner = poster.replace('covers' , 'banners').trim();
+      const type = $element.find('div.Description p span.Type').text();
+      const synopsis = $element.find('div.Description p').eq(1).text().trim();
+      const rating = $element.find('div.Description p span.Vts').text();
+      const debut = $element.find('a span.Estreno').text().toLowerCase();
+
+      promises.push(animeEpisodesHandler(id).then(async extra => ({
+        id: id || null,
+        title: title || null,
+        //id: id || null,
+        poster: await imageUrlToBase64(poster) || null,
+        banner: banner || null,
+        synopsis: synopsis || null,
+        debut: extra.animeExtraInfo[0].debut || null,
+        type: type || null,
+        rating: rating || null,
+        genres: extra.genres || null,
+        episodes: extra.listByEps || null
+      })))
+
+    })
+
+  } while (promises.length === 0)
+
   return Promise.all(promises);
 };
 
 const special = async(order , page) => {
-  const res = await cloudscraper(`${BROWSE_URL}type%5B%5D=special&order=${order}&page=${page}` , {method: 'GET'});
-  const body = await res;
-  const $ = cheerio.load(body);
-  const promises = [];
 
-  $('div.Container ul.ListAnimes li article').each((index , element) =>{
-    const $element = $(element);
-    const id = $element.find('div.Description a.Button').attr('href').slice(1);
-    const title = $element.find('a h3').text();
-    const poster = $element.find('a div.Image figure img').attr('src');
-    const banner = poster.replace('covers' , 'banners').trim();
-    const type = $element.find('div.Description p span.Type').text();
-    const synopsis = $element.find('div.Description p').eq(1).text().trim();
-    const rating = $element.find('div.Description p span.Vts').text();
-    const debut = $element.find('a span.Estreno').text().toLowerCase();
-    promises.push(animeEpisodesHandler(id).then(async extra => ({
-      id: id || null,
-      title: title || null,
-      //id: id || null,
-      poster: await imageUrlToBase64(poster) || null,
-      banner: banner || null,
-      synopsis: synopsis || null,
-      debut: extra.animeExtraInfo[0].debut || null,
-      type: type || null,
-      rating: rating || null,
-      genres: extra.genres || null,
-      episodes: extra.listByEps || null
-    })))
-  })
+  let promises = [];
+
+  do {
+
+    const res = await cloudscraper(`${BROWSE_URL}type%5B%5D=special&order=${order}&page=${page}` , {method: 'GET'});
+    const body = await res;
+    const $ = cheerio.load(body);
+
+    $('div.Container ul.ListAnimes li article').each((index , element) =>{
+      const $element = $(element);
+      const id = $element.find('div.Description a.Button').attr('href').slice(1);
+      const title = $element.find('a h3').text();
+      const poster = $element.find('a div.Image figure img').attr('src');
+      const banner = poster.replace('covers' , 'banners').trim();
+      const type = $element.find('div.Description p span.Type').text();
+      const synopsis = $element.find('div.Description p').eq(1).text().trim();
+      const rating = $element.find('div.Description p span.Vts').text();
+
+      promises.push(animeEpisodesHandler(id).then(async extra => ({
+        id: id || null,
+        title: title || null,
+        poster: await imageUrlToBase64(poster) || null,
+        banner: banner || null,
+        synopsis: synopsis || null,
+        debut: extra.animeExtraInfo[0].debut || null,
+        type: type || null,
+        rating: rating || null,
+        genres: extra.genres || null,
+        episodes: extra.listByEps || null
+      })))
+
+    })
+
+  } while (promises.length === 0)
+
   return Promise.all(promises);
 };
 
 const movies = async(order , page) => {
-  const res = await cloudscraper(`${BROWSE_URL}type%5B%5D=movie&order=${order}&page=${page}`, {method: 'GET'});
-  const body = await res;
-  const $ = cheerio.load(body);
-  const promises = [];
 
-  $('div.Container ul.ListAnimes li article').each((index , element) =>{
-    const $element = $(element);
-    const id = $element.find('div.Description a.Button').attr('href').slice(1);
-    const title = $element.find('a h3').text();
-    const poster = $element.find('a div.Image figure img').attr('src');
-    const banner = poster.replace('covers' , 'banners').trim();
-    const type = $element.find('div.Description p span.Type').text();
-    const synopsis = $element.find('div.Description p').eq(1).text().trim();
-    const rating = $element.find('div.Description p span.Vts').text();
-    const debut = $element.find('a span.Estreno').text().toLowerCase();
-    promises.push(animeEpisodesHandler(id).then(async extra => ({
-      id: id || null,
-      title: title || null,
-      //id: id || null,
-      poster: await imageUrlToBase64(poster) || null,
-      banner: banner || null,
-      synopsis: synopsis || null,
-      debut: extra.animeExtraInfo[0].debut || null,
-      type: type || null,
-      rating: rating || null,
-      genres: extra.genres || null,
-      episodes: extra.listByEps || null
-    })))
-  })
+  let promises = [];
+
+  do {
+
+    const res = await cloudscraper(`${BROWSE_URL}type%5B%5D=movie&order=${order}&page=${page}`, {method: 'GET'});
+    const body = await res;
+    const $ = cheerio.load(body);
+
+    $('div.Container ul.ListAnimes li article').each((index , element) =>{
+      const $element = $(element);
+      const id = $element.find('div.Description a.Button').attr('href').slice(1);
+      const title = $element.find('a h3').text();
+      const poster = $element.find('a div.Image figure img').attr('src');
+      const banner = poster.replace('covers' , 'banners').trim();
+      const type = $element.find('div.Description p span.Type').text();
+      const synopsis = $element.find('div.Description p').eq(1).text().trim();
+      const rating = $element.find('div.Description p span.Vts').text();
+
+      promises.push(animeEpisodesHandler(id).then(async extra => ({
+        id: id || null,
+        title: title || null,
+        poster: await imageUrlToBase64(poster) || null,
+        banner: banner || null,
+        synopsis: synopsis || null,
+        debut: extra.animeExtraInfo[0].debut || null,
+        type: type || null,
+        rating: rating || null,
+        genres: extra.genres || null,
+        episodes: extra.listByEps || null
+      })))
+
+    })
+  } while (promises.length === 0)
+
   return Promise.all(promises);
 };
 
