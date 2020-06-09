@@ -1,33 +1,8 @@
-const cloudscraper = require('cloudscraper')
-const imageToBase64 = require("image-to-base64");
 const zsExtract = require("zs-extract");
+const base64 = require('node-base64-image');
 
-
-const MergeRecursive = (obj1 , obj2) => {
-  for(var p in obj2) {
-    try{
-      // Property in destination object set; update its value.
-      if(obj2[p].constructor == Object){
-        obj1[p] = MergeRecursive(obj1[p], obj2[p]);
-      }else{
-        obj1[p] = obj2[p];
-      }
-    }catch(e){
-      // Property in destination object not set; create it and set its value.
-      obj1[p] = obj2[p];
-    }
-  }
-  return obj1;
-}
-
-const imageUrlToBase64 = async(url) => {
-  let res = await cloudscraper({
-    url,
-    method: "GET",
-    encoding: null
-  });
-
-  return Buffer.from(res).toString("base64");
+const imageUrlToBase64 = async (url) => {
+  return await base64.encode(url, {string: true});
 };
 
 const urlify = async(text) =>{
@@ -46,7 +21,6 @@ const decodeZippyURL = async(url) =>{
 
 
 module.exports = {
-  MergeRecursive,
   imageUrlToBase64,
   urlify,
   decodeZippyURL
