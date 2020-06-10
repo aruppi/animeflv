@@ -418,9 +418,12 @@ router.get('/Genres/:genre/:order/:page' , (req , res) =>{
  */
 
 router.get('/Movies/:order/:page' , (req , res) =>{
+
   let order = req.params.order;
   let page = req.params.page;
-  api.movies(order , page)
+  let type = { category: 'movie' }
+
+  api.special(order, page, type)
     .then(movies =>{
         if (movies.length > 0) {
             res.status(200).json({
@@ -496,9 +499,12 @@ router.get('/Movies/:order/:page' , (req , res) =>{
  */
 
 router.get('/Special/:order/:page' , (req , res) =>{
+
   let order = req.params.order;
   let page = req.params.page;
-  api.special(order , page)
+  let type = { category: 'special' }
+
+  api.special(order, page, type)
     .then(special =>{
         if (special.length > 0) {
             res.status(200).json({
@@ -510,6 +516,7 @@ router.get('/Special/:order/:page' , (req , res) =>{
     }).catch((err) =>{
       console.error(err);
     });
+
 });
 
 /**
@@ -576,9 +583,12 @@ router.get('/Special/:order/:page' , (req , res) =>{
  */
 
 router.get('/Ova/:order/:page' , (req , res) =>{
+
   let order = req.params.order;
   let page = req.params.page;
-  api.ova(order , page)
+  let type = { category: 'ova' }
+
+  api.special(order, page, type)
     .then(ova =>{
         if (ova.length > 0) {
             res.status(200).json({
@@ -590,6 +600,7 @@ router.get('/Ova/:order/:page' , (req , res) =>{
     }).catch((err) =>{
       console.error(err);
     });
+
 });
 
 
@@ -684,9 +695,12 @@ router.get('/Ova/:order/:page' , (req , res) =>{
  */
 
 router.get('/TV/:order/:page' , (req , res) =>{
+
   let order = req.params.order;
   let page = req.params.page;
-  api.tv(order , page)
+  let type = { category: 'tv' }
+
+  api.special(order , page, type)
     .then(tv =>{
         if (tv.length > 0) {
             res.status(200).json({
@@ -706,7 +720,7 @@ router.get('/TV/:order/:page' , (req , res) =>{
  *  @apiVersion 1.0.5
  *  @apiName GetAnimeByState
  *  @apiGroup AnimeByState
- * 
+ *
  *  @apiSuccess {String} id           Anime id
  *  @apiSuccess {String} title        Anime title
  *  @apiSuccess {String} poster       Poster (img) on base64

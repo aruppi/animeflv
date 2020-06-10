@@ -1,1 +1,0 @@
-npx apidoc -i ./ -e node_modules -o ./animeflv-docs

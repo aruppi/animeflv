@@ -7,7 +7,7 @@ router.get('/', (req, res) => {
   res.json({
     message: 'AnimeFLV API - 🎏',
     author: 'Jéluchu',
-    version: '1.0.7',
+    version: '1.0.10',
     credits: 'For the firs author Chris Michael, who has stopped maintaining it',
     entries: [
       {
