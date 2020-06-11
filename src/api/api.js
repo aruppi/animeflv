@@ -534,7 +534,7 @@ const animeEpisodesHandler = async(id) =>{
       }
     });
     const AnimeThumbnailsId = anime_info_ids[0].split(',')[0].split('"')[1];
-    const animeId = anime_info_ids[0].split(',')[1];
+    const animeId = id.split('anime/')[1];
 
     let nextEpisodeDate
 
