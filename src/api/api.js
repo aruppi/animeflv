@@ -1,6 +1,6 @@
 const cheerio = require('cheerio');
 const cheerioTableparser = require('cheerio-tableparser');
-const cloudscraper = require('cloudscraper');
+const hooman = require('hooman');
 const html = require('got');
 const decodeURL = require('urldecode');
 const {urlify , decodeZippyURL , imageUrlToBase64} = require('../utils/index');
@@ -67,8 +67,8 @@ const downloadLinksByEpsId = async(id) =>{
     res = await html(`${ANIME_VIDEO_URL}${id}`);
     $ = await cheerio.load(res.body);
   } catch (error) {
-    res = await cloudscraper.get(`${ANIME_VIDEO_URL}${id}`);
-    $ = await cheerio.load(res)
+    res = await hooman.get(`${ANIME_VIDEO_URL}${id}`);
+    $ = await cheerio.load(res.body)
   }
 
   cheerioTableparser($);
@@ -229,8 +229,8 @@ const search = async(query) =>{
     res = await html(`${SEARCH_URL}${query}`);
     $ = await cheerio.load(res.body);
   } catch (error) {
-    res = await cloudscraper.get(`${SEARCH_URL}${query}`);
-    $ = await cheerio.load(res)
+    res = await hooman.get(`${SEARCH_URL}${query}`);
+    $ = await cheerio.load(res.body)
   }
 
   $('div.Container ul.ListAnimes li article').each((index , element) =>{
@@ -273,8 +273,8 @@ const animeByState = async(state, order, page ) => {
     res = await html(`${BROWSE_URL}type%5B%5D=tv&status%5B%5D=${state}&order=${order}&page=${page}`);
     $ = await cheerio.load(res.body);
   } catch (error) {
-    res = await cloudscraper.get(`${BROWSE_URL}type%5B%5D=tv&status%5B%5D=${state}&order=${order}&page=${page}`);
-    $ = await cheerio.load(res)
+    res = await hooman.get(`${BROWSE_URL}type%5B%5D=tv&status%5B%5D=${state}&order=${order}&page=${page}`);
+    $ = await cheerio.load(res.body)
   }
 
   $('div.Container ul.ListAnimes li article').each((index , element) =>{
@@ -317,8 +317,8 @@ const special = async(order, page, type) => {
     res = await html(`${BROWSE_URL}type%5B%5D=${type.category}&order=${order}&page=${page}`);
     $ = await cheerio.load(res.body);
   } catch (error) {
-    res = await cloudscraper.get(`${BROWSE_URL}type%5B%5D=${type.category}&order=${order}&page=${page}`);
-    $ = await cheerio.load(res)
+    res = await hooman.get(`${BROWSE_URL}type%5B%5D=${type.category}&order=${order}&page=${page}`);
+    $ = await cheerio.load(res.body)
   }
 
   $('div.Container ul.ListAnimes li article').each((index , element) =>{
@@ -361,8 +361,8 @@ const animeByGenres = async(genre, order, page) => {
     res = await html(`${BROWSE_URL}genre%5B%5D=${genre}&order=${order}&page=${page}`);
     $ = await cheerio.load(res.body);
   } catch (error) {
-    res = await cloudscraper.get(`${BROWSE_URL}genre%5B%5D=${genre}&order=${order}&page=${page}`);
-    $ = await cheerio.load(res)
+    res = await hooman.get(`${BROWSE_URL}genre%5B%5D=${genre}&order=${order}&page=${page}`);
+    $ = await cheerio.load(res.body)
   }
 
   $('div.Container ul.ListAnimes li article').each((index , element) =>{
@@ -404,8 +404,8 @@ const latestEpisodesAdded = async() =>{
     res = await html(`${BASE_URL}`);
     $ = await cheerio.load(res.body);
   } catch (error) {
-    res = await cloudscraper.get(`${BASE_URL}`);
-    $ = await cheerio.load(res)
+    res = await hooman.get(`${BASE_URL}`);
+    $ = await cheerio.load(res.body)
   }
 
   $('div.Container ul.ListEpisodios li').each((index , element) =>{
@@ -439,8 +439,8 @@ const latestAnimeAdded = async() =>{
     res = await html(`${BASE_URL}`);
     $ = await cheerio.load(res.body);
   } catch (error) {
-    res = await cloudscraper.get(`${BASE_URL}`);
-    $ = await cheerio.load(res)
+    res = await hooman.get(`${BASE_URL}`);
+    $ = await cheerio.load(res.body)
   }
 
   $('div.Container ul.ListAnimes li article').each((index , element) =>{
@@ -484,8 +484,8 @@ const animeEpisodesHandler = async(id) =>{
       res = await html(`${BASE_URL}/${id}`);
       $ = await cheerio.load(res.body);
     } catch (error) {
-      res = await cloudscraper.get(`${BASE_URL}/${id}`);
-      $ = await cheerio.load(res)
+      res = await hooman.get(`${BASE_URL}/${id}`);
+      $ = await cheerio.load(res.body)
     }
 
     const scripts = $('script');
@@ -582,8 +582,8 @@ const getAnimeServers = async(id) =>{
     res = await html(`${ANIME_VIDEO_URL}${id}`);
     $ = await cheerio.load(res.body);
   } catch (error) {
-    res = await cloudscraper.get(`${ANIME_VIDEO_URL}${id}`);
-    $ = await cheerio.load(res)
+    res = await hooman.get(`${ANIME_VIDEO_URL}${id}`);
+    $ = await cheerio.load(res.body)
   }
 
   const scripts = $('script');

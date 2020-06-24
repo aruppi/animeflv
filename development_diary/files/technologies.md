@@ -10,8 +10,6 @@
 
 - [x] *[cheerio](https://cheerio.js.org/) Fast, flexible & lean implementation of core jQuery designed specifically for the server.*
 
-- [x] *[cloudscraper](https://github.com/codemanki/cloudscraper) Node.js library to bypass Cloudflare's anti-ddos page.*
-
 
 ## 📦Tests tools used
 - [x] *[mochajs](https://mochajs.org/) Mocha is a feature-rich JavaScript test framework running on Node.js and in the browser, making asynchronous testing simple and fun. Mocha tests run serially, allowing for flexible and accurate reporting, while mapping uncaught exceptions to the correct test cases.*

@@ -1,8 +1,9 @@
 const zsExtract = require("zs-extract");
-const base64 = require('node-base64-image');
+const hooman = require('hooman');
 
 const imageUrlToBase64 = async (url) => {
-  return await base64.encode(url, {string: true});
+  let img = await hooman.get(url)
+  return img.rawBody.toString('base64');
 };
 
 const urlify = async(text) =>{
