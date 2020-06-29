@@ -1,9 +1,10 @@
-const cheerio = require('cheerio');
 const cheerioTableparser = require('cheerio-tableparser');
-const hooman = require('hooman');
-const html = require('got');
 const decodeURL = require('urldecode');
 const {urlify , decodeZippyURL , imageUrlToBase64} = require('../utils/index');
+
+const {
+  homgot
+} = require('../api/apiCall');
 
 const {
   BASE_URL         , SEARCH_URL             , BROWSE_URL ,
@@ -13,13 +14,15 @@ const {
 
 const animeExtraInfo = async(title) =>{
 
-  const res = await html(`${BASE_JIKA_URL}search/anime?q=${title}`).json();
+  let options = { parse: true }
+  const res = await homgot(`${BASE_JIKA_URL}search/anime?q=${title}`,options)
+
   const matchAnime = res.results.filter(x => x.title === title);
   const malId = matchAnime[0].mal_id;
 
   if(typeof matchAnime[0].mal_id === 'undefined') return null;
 
-  const data = await html(`${BASE_JIKA_URL}anime/${malId}`).json();
+  const data = await homgot(`${BASE_JIKA_URL}anime/${malId}`,options)
   const body = Array(data);
   const promises = [];
 
@@ -60,16 +63,9 @@ const animeExtraInfo = async(title) =>{
 
 const downloadLinksByEpsId = async(id) =>{
 
-  let res
   let $
-
-  try {
-    res = await html(`${ANIME_VIDEO_URL}${id}`);
-    $ = await cheerio.load(res.body);
-  } catch (error) {
-    res = await hooman.get(`${ANIME_VIDEO_URL}${id}`);
-    $ = await cheerio.load(res.body)
-  }
+  let options = { scrapy: true }
+  $ = await homgot(`${ANIME_VIDEO_URL}${id}`,options)
 
   cheerioTableparser($);
   let tempServerNames = $('table.RTbl').parsetable(true , true , true)[0];
@@ -153,13 +149,14 @@ const getAnimeInfo = async(id , title) =>{
 
 const getAnimeVideoPromo = async(title) =>{
 
-  const res = await html(`${BASE_JIKA_URL}search/anime?q=${title}`).json();
+  let options = { parse: true }
+  const res = await homgot(`${BASE_JIKA_URL}search/anime?q=${title}`,options)
   const matchAnime = res.results.filter(x => x.title === title);
   const malId = matchAnime[0].mal_id;
 
   if(typeof matchAnime[0].mal_id === 'undefined') return null;
 
-  const data = await html(`${BASE_JIKA_URL}anime/${malId}/videos`).json();
+  const data = await homgot(`${BASE_JIKA_URL}anime/${malId}/videos`,options)
   const body = data.promo;
   const promises = [];
 
@@ -176,13 +173,14 @@ const getAnimeVideoPromo = async(title) =>{
 
 const getAnimeCharacters = async(title) =>{
 
-  const res = await html(`${BASE_JIKA_URL}search/anime?q=${title}`).json();
+  let options = { parse: true }
+  const res = await homgot(`${BASE_JIKA_URL}search/anime?q=${title}`,options)
   const matchAnime = res.results.filter(x => x.title === title);
   const malId = matchAnime[0].mal_id;
 
   if(typeof matchAnime[0].mal_id === 'undefined') return null;
 
-  const data = await html(`${BASE_JIKA_URL}anime/${malId}/characters_staff`).json();
+  const data = await homgot(`${BASE_JIKA_URL}anime/${malId}/characters_staff`,options);
   let body = data.characters;
 
   if(typeof body === 'undefined') return null;
@@ -221,17 +219,10 @@ const getAnimeCharacters = async(title) =>{
 
 const search = async(query) =>{
 
-  let res
   let $
   let promises = []
-
-  try {
-    res = await html(`${SEARCH_URL}${query}`);
-    $ = await cheerio.load(res.body);
-  } catch (error) {
-    res = await hooman.get(`${SEARCH_URL}${query}`);
-    $ = await cheerio.load(res.body)
-  }
+  let options = { scrapy: true }
+  $ = await homgot(`${SEARCH_URL}${query}`,options)
 
   $('div.Container ul.ListAnimes li article').each((index , element) =>{
 
@@ -265,17 +256,10 @@ const search = async(query) =>{
 
 const animeByState = async(state, order, page ) => {
 
-  let res
   let $
   let promises = []
-
-  try {
-    res = await html(`${BROWSE_URL}type%5B%5D=tv&status%5B%5D=${state}&order=${order}&page=${page}`);
-    $ = await cheerio.load(res.body);
-  } catch (error) {
-    res = await hooman.get(`${BROWSE_URL}type%5B%5D=tv&status%5B%5D=${state}&order=${order}&page=${page}`);
-    $ = await cheerio.load(res.body)
-  }
+  let options = { scrapy: true }
+  $ = await homgot(`${BROWSE_URL}type%5B%5D=tv&status%5B%5D=${state}&order=${order}&page=${page}`,options)
 
   $('div.Container ul.ListAnimes li article').each((index , element) =>{
 
@@ -309,17 +293,10 @@ const animeByState = async(state, order, page ) => {
 
 const special = async(order, page, type) => {
 
-  let res
   let $
   let promises = []
-
-  try {
-    res = await html(`${BROWSE_URL}type%5B%5D=${type.category}&order=${order}&page=${page}`);
-    $ = await cheerio.load(res.body);
-  } catch (error) {
-    res = await hooman.get(`${BROWSE_URL}type%5B%5D=${type.category}&order=${order}&page=${page}`);
-    $ = await cheerio.load(res.body)
-  }
+  let options = { scrapy: true }
+  $ = await homgot(`${BROWSE_URL}type%5B%5D=${type.category}&order=${order}&page=${page}`,options)
 
   $('div.Container ul.ListAnimes li article').each((index , element) =>{
 
@@ -353,17 +330,10 @@ const special = async(order, page, type) => {
 
 const animeByGenres = async(genre, order, page) => {
 
-  let res
   let $
   let promises = []
-
-  try {
-    res = await html(`${BROWSE_URL}genre%5B%5D=${genre}&order=${order}&page=${page}`);
-    $ = await cheerio.load(res.body);
-  } catch (error) {
-    res = await hooman.get(`${BROWSE_URL}genre%5B%5D=${genre}&order=${order}&page=${page}`);
-    $ = await cheerio.load(res.body)
-  }
+  let options = { scrapy: true }
+  $ = await homgot(`${BROWSE_URL}genre%5B%5D=${genre}&order=${order}&page=${page}`,options)
 
   $('div.Container ul.ListAnimes li article').each((index , element) =>{
     const $element = $(element);
@@ -396,17 +366,10 @@ const animeByGenres = async(genre, order, page) => {
 
 const latestEpisodesAdded = async() =>{
 
-  let res
   let $
   let promises = []
-
-  try {
-    res = await html(`${BASE_URL}`);
-    $ = await cheerio.load(res.body);
-  } catch (error) {
-    res = await hooman.get(`${BASE_URL}`);
-    $ = await cheerio.load(res.body)
-  }
+  let options = { scrapy: true }
+  $ = await homgot(`${BASE_URL}`,options)
 
   $('div.Container ul.ListEpisodios li').each((index , element) =>{
 
@@ -431,17 +394,10 @@ const latestEpisodesAdded = async() =>{
 
 const latestAnimeAdded = async() =>{
 
-  let res
   let $
   let promises = []
-
-  try {
-    res = await html(`${BASE_URL}`);
-    $ = await cheerio.load(res.body);
-  } catch (error) {
-    res = await hooman.get(`${BASE_URL}`);
-    $ = await cheerio.load(res.body)
-  }
+  let options = { scrapy: true }
+  $ = await homgot(`${BASE_URL}`,options)
 
   $('div.Container ul.ListAnimes li article').each((index , element) =>{
 
@@ -477,16 +433,9 @@ const animeEpisodesHandler = async(id) =>{
 
   try{
 
-    let res
     let $
-
-    try {
-      res = await html(`${BASE_URL}/${id}`);
-      $ = await cheerio.load(res.body);
-    } catch (error) {
-      res = await hooman.get(`${BASE_URL}/${id}`);
-      $ = await cheerio.load(res.body)
-    }
+    let options = { scrapy: true }
+    $ = await homgot(`${BASE_URL}/${id}`,options)
 
     const scripts = $('script');
     const anime_info_ids = [];
@@ -575,16 +524,9 @@ const animeEpisodesHandler = async(id) =>{
 
 const getAnimeServers = async(id) =>{
 
-  let res
   let $
-
-  try {
-    res = await html(`${ANIME_VIDEO_URL}${id}`);
-    $ = await cheerio.load(res.body);
-  } catch (error) {
-    res = await hooman.get(`${ANIME_VIDEO_URL}${id}`);
-    $ = await cheerio.load(res.body)
-  }
+  let options = { scrapy: true }
+  $ = await homgot(`${ANIME_VIDEO_URL}${id}`,options)
 
   const scripts = $('script');
   const servers = [];
