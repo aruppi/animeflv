@@ -1,5 +1,6 @@
 const express = require('express');
 const routes = require('./routes/index');
+const version = require('./../../package.json').version;
 
 const router = express.Router();
 
@@ -7,7 +8,7 @@ router.get('/', (req, res) => {
   res.json({
     message: 'AnimeFLV API - 🎏',
     author: 'Jéluchu',
-    version: '1.0.14',
+    version: version,
     credits: 'For the firs author Chris Michael, who has stopped maintaining it',
     entries: [
       {

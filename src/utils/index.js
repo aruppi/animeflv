@@ -1,4 +1,3 @@
-const zsExtract = require("zs-extract");
 const {
   homgot
 } = require('../api/apiCall');
@@ -18,13 +17,7 @@ const urlify = async(text) =>{
   return Promise.all(urls);
 };
 
-const decodeZippyURL = async(url) =>{
-  const mp4 = await zsExtract.extract(url);
-  return mp4.download;
-}
-
 module.exports = {
   imageUrlToBase64,
-  urlify,
-  decodeZippyURL
+  urlify
 }

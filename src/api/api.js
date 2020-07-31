@@ -1,6 +1,6 @@
 const cheerioTableparser = require('cheerio-tableparser');
 const decodeURL = require('urldecode');
-const {urlify , decodeZippyURL , imageUrlToBase64} = require('../utils/index');
+const {urlify, imageUrlToBase64} = require('../utils/index');
 
 const {
   homgot
@@ -90,20 +90,9 @@ const downloadLinksByEpsId = async(id) =>{
     Array.from({length: tempUrls.length} , (v , k) =>{
       urls.push({
         server: serverNames[k],
-        url: urlDecoded[k],
+        url: tempUrls[k],
       });
     });
-
-    const zippyshareURL = urls.filter(doc => doc.server == 'Zippyshare')[0].url || null;
-    const zippyMP4 = await decodeZippyURL(zippyshareURL);
-
-    for(var key in urls){
-      if(urls.hasOwnProperty(key)){
-        if(urls[key].server == 'Zippyshare'){
-          urls[key].url = zippyMP4
-        }
-      }
-    }
 
   }catch(err){
     console.log(err);
