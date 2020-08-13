@@ -189,3 +189,5 @@ fabric.properties
 
 # exclude apidocs
 animeflv-docs/
+
+.idea/

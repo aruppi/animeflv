@@ -25,6 +25,7 @@ router.get('/', (req, res) => {
         'AnimeCharacters': '/api/v1/AnimeCharacters/:title',
         'AnimeTrailers': '/api/v1/AnimeTrailers/:title',
         'GetAnimeInfo': '/api/v1/GetAnimeInfo/:id/:title',
+        'AllAnimes': '/api/v2/allAnimes',
         'DownloadLinksByEpsId': '/api/v1/DownloadLinksByEpsId/:epsId'
       }
     ]

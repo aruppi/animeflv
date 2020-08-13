@@ -1,4 +1,4 @@
-# **Animeflv** (v1.0.15) :flags:
+# **Animeflv** (v1.1.0) :flags:
 
 > This is a custom API that has the entire catalog of the animeflv.net website. 
 > You can enjoy all the content with subtitles in Spanish and the latest in the world of anime for free.

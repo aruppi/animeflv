@@ -25,6 +25,5 @@ const homgot = async (url, options) => {
 
 }
 
-module.exports = {
-    homgot
-}
+
+module.exports = {homgot}
