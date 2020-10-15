@@ -9,7 +9,7 @@ router.get('/', (req, res) => {
     message: 'AnimeFLV API - 🎏',
     author: 'Jéluchu',
     version: version,
-    credits: 'For the firs author Chris Michael, who has stopped maintaining it',
+    credits: 'Jeluchu & Chris Michael, the creator who has stopped maintaining it',
     entries: [
       {
         'LatestAnimeAdded': '/api/v1/LatestAnimeAdded',
@@ -25,7 +25,7 @@ router.get('/', (req, res) => {
         'AnimeCharacters': '/api/v1/AnimeCharacters/:title',
         'AnimeTrailers': '/api/v1/AnimeTrailers/:title',
         'GetAnimeInfo': '/api/v1/GetAnimeInfo/:id/:title',
-        'AllAnimes': '/api/v2/allAnimes',
+        'AllAnimes': '/api/v1/allAnimes',
         'DownloadLinksByEpsId': '/api/v1/DownloadLinksByEpsId/:epsId'
       }
     ]
