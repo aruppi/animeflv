@@ -59,10 +59,10 @@ describe('> entries ...' , () =>{
       })
       ok();
   });
-  it('GET Method /api/v1/Genres/accion/rating/1' , ok =>{
+  it('GET Method /api/v1/Genres/:[genre]/:[sortBy]/:[page]', ok =>{
     chai
       .request(app)
-      .get('/api/v1/Genres/:[genre]/:[sortBy]/:[page]')
+      .get('/api/v1/Genres/accion/rating/1')
       .end((err, res) =>{
         expect(res).to.have.status(200);
         expect(res.body.animes).to.be.an('array');
@@ -79,7 +79,7 @@ describe('> entries ...' , () =>{
       })
       ok();
   });
-  it('/api/v1/Special/:[sortBy]/:[page]' , ok =>{
+  it('GET Method /api/v1/Special/:[sortBy]/:[page]' , ok =>{
     chai
       .request(app)
       .get('/api/v1/Special/added/1')
@@ -149,10 +149,10 @@ describe('> entries ...' , () =>{
       })
       ok();
   });
-  it('GET Method /api/v1/GetAnimeInfo/:[id]/:[title]' , ok =>{
+  it('GET Method /api/v1/GetAnimeInfo/:[title]' , ok =>{
     chai
       .request(app)
-      .get('/api/v1/GetAnimeInfo/anime/5226/tokyo-ghoul/Tokyo Ghoul')
+      .get('/api/v1/GetAnimeInfo/Tokyo Ghoul')
       .end((err, res) =>{
         expect(res).to.have.status(200);
         expect(res.body.info).to.be.an('array');
