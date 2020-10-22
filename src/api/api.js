@@ -1,13 +1,13 @@
 const cheerioTableparser = require('cheerio-tableparser');
 const decodeURL = require('urldecode');
-const {getInfo, animeflvInfo, animeExtraInfo, urlify, imageUrlToBase64} = require('../utils/index');
+const {getInfo, animeInfo, animeExtraInfo, getMALid, urlify, getAllAnimes, imageUrlToBase64} = require('../utils/index');
 
 const {
   homgot
 } = require('../api/apiCall');
 
 const {
-  BASE_URL, SEARCH_URL, BROWSE_URL, ANIME_VIDEO_URL, BASE_JIKA_URL
+  BASE_URL, BROWSE_URL, ANIME_VIDEO_URL, BASE_JIKA_URL
 } = require('./urls');
 
 const latestAnimeAdded = async() =>
@@ -42,19 +42,24 @@ const latestEpisodesAdded = async() =>{
 
 const getAnimeServers = async(id) =>{
 
-  let $ = await homgot(`${ANIME_VIDEO_URL}${id}`, { scrapy: true })
-  const scripts = $('script');
-  const servers = [];
+  try {
 
-  Array.from({length: scripts.length} , (v , k) =>{
-    const $script = $(scripts[k]);
-    const contents = $script.html();
-    if((contents || '').includes('var videos = {')) {
-      servers.push(JSON.parse(contents.split('var videos = ')[1].split(';')[0]).SUB)
-    }
-  });
+    let $ = await homgot(`${ANIME_VIDEO_URL}${id}`, { scrapy: true })
+    const scripts = $('script');
+    const servers = [];
 
-  return servers[0];
+    Array.from({length: scripts.length} , (v , k) =>{
+      const contents = $(scripts[k]).html();
+      if((contents || '').includes('var videos = {')) {
+        servers.push(JSON.parse(contents.split('var videos = ')[1].split(';')[0]).SUB)
+      }
+    });
+
+    return servers[0];
+
+  } catch (e) {
+    console.log(e)
+  }
 
 };
 
@@ -68,126 +73,68 @@ const animeByState = async(data) =>
     getInfo(await homgot(`${BROWSE_URL}type%5B%5D=tv&status%5B%5D=${data.state}&order=${data.order}&page=${data.page}`,{ scrapy: true }));
 
 const search = async(query) =>
-    getInfo(await homgot(`${SEARCH_URL}${query}`,{ scrapy: true }));
+    getInfo(await homgot(`${BROWSE_URL}q=${query}`,{ scrapy: true }));
 
 const getAnimeCharacters = async(title) =>{
 
-  const res = await homgot(`${BASE_JIKA_URL}search/anime?q=${title}`, { parse: true })
-  const matchAnime = res.results.filter(x => x.title === title);
-  const malId = matchAnime[0].mal_id;
+  const matchAnime = await getMALid(title)
 
-  if(typeof malId === 'undefined') return null;
-
-  const data = await homgot(`${BASE_JIKA_URL}anime/${malId}/characters_staff`, { parse: true });
-  let body = data.characters;
-
-  if(typeof body === 'undefined') return null;
-
-  const charactersId = body.map(doc => doc.mal_id)
-  const charactersNames = body.map(doc => doc.name);
-  const charactersImages = body.map(doc => doc.image_url);
-  const charactersRoles = body.map(doc => doc.role);
-
-  let characters = [];
-  Array.from({length: charactersNames.length} , (v , k) =>{
-    const id = charactersId[k];
-    let name = charactersNames[k];
-    let characterImg = charactersImages[k];
-    let role = charactersRoles[k];
-    characters.push({
-      character:{
-        id: id,
-        name: name,
-        image: characterImg,
-        role: role
-      }
-    });
-  });
-
-  return Promise.all(characters);
+  try {
+    if(matchAnime !== null) {
+      const data = await homgot(`${BASE_JIKA_URL}anime/${matchAnime.mal_id}/characters_staff`, { parse: true });
+      return data.characters.map(doc => ({
+          id: doc.mal_id,
+          name: doc.name,
+          image: doc.image_url,
+          role: doc.role
+      }));
+    }
+  } catch (err) {
+    console.log(err)
+  }
 
 };
 
 const getAnimeVideoPromo = async(title) =>{
 
-  const res = await homgot(`${BASE_JIKA_URL}search/anime?q=${title}`, { parse: true })
-  const matchAnime = res.results.filter(x => x.title === title);
-  const malId = matchAnime[0].mal_id;
+  const matchAnime = await getMALid(title)
 
-  if(typeof malId === 'undefined') return null;
-
-  const data = await homgot(`${BASE_JIKA_URL}anime/${malId}/videos`, { parse: true })
-  const body = data.promo;
-
-  body.map(doc =>({
-    title: doc.title,
-    previewImage: doc.image_url,
-    videoURL: doc.video_url
-  }));
-
-  return Promise.all(body);
+  try {
+    if(matchAnime !== null) {
+      const data = await homgot(`${BASE_JIKA_URL}anime/${matchAnime.mal_id}/videos`, {parse: true})
+      return data.promo.map(doc => ({
+        title: doc.title,
+        previewImage: doc.image_url,
+        videoURL: doc.video_url
+      }));
+    }
+  } catch (err) {
+    console.log(err)
+  }
 
 };
 
 const getAnimeInfo = async(title) =>{
 
   let promises = [];
-  let animeTitle = ''
   let animeId = ''
   let animeType = ''
   let animeIndex = ''
 
-  let seriesTitle
-  let position
-
-  const titles = [
-    { animeflv: 'Kaguya-sama wa Kokurasetai: Tensai-tachi no Renai Zunousen 2nd Season', myanimelist: 'Kaguya-sama wa Kokurasetai?: Tensai-tachi no Renai Zunousen', alternative: 'Kaguya-sama wa Kokurasetai'},
-    { animeflv: 'Naruto Shippuden', myanimelist: 'Naruto: Shippuuden' },
-    { animeflv: 'Rock Lee no Seishun Full-Power Ninden', myanimelist: 'Naruto SD: Rock Lee no Seishun Full-Power Ninden' },
-    { animeflv: 'BAKI: dai reitaisai-hen', myanimelist: 'Baki 2nd Season' },
-    { animeflv: 'Hitoribocchi no ○○ Seikatsu', myanimelist: 'Hitoribocchi no Marumaru Seikatsu' },
-    { animeflv: 'Nekopara (TV)', myanimelist: 'Nekopara' },
-    { animeflv: 'Black Clover (TV)', myanimelist: 'Black Clover' }
-  ];
-
-  for (let name in titles) {
-    if (title === titles[name].animeflv || title === titles[name].myanimelist || title === titles[name].alternative) {
-      seriesTitle = titles[name].animeflv
-      position = name
-    }
-  }
-
-
-  if (seriesTitle === undefined) {
-    seriesTitle = title
-  }
-
   await getAllAnimes().then(animes => {
-
     for (const i in animes) {
-      if (animes[i].title.split('\t')[0] === seriesTitle.split('\t')[0] ||
-          animes[i].title === `${seriesTitle} (TV)` ||
-          animes[i].title.includes(seriesTitle.split('○')[0])
-      ) {
-        if (animes[i].title.includes('(TV)', 0)) { animeTitle = animes[i].title.split('\t')[0].replace(' (TV)', '') }
-        else { animeTitle = animes[i].title.split('\t')[0] }
+      if (animes[i].title.split('\t')[0] === title.split('\t')[0]) {
         animeId = animes[i].id
         animeIndex = animes[i].index
         animeType = animes[i].type.toLowerCase()
-
-        if (position !== undefined) {
-          seriesTitle = titles[position].myanimelist
-        }
-
         break;
-
       }
     }
   });
 
   try{
-    promises.push(await animeflvInfo(animeId, animeIndex).then(async extra => ({
-      title: animeTitle || null,
+    promises.push(await animeInfo(`anime/${animeId}`, animeIndex).then(async extra => ({
+      title: title || null,
       poster: await imageUrlToBase64(extra.animeExtraInfo[0].poster) || null,
       banner: extra.animeExtraInfo[0].banner || null,
       synopsis: extra.animeExtraInfo[0].synopsis || null,
@@ -207,25 +154,11 @@ const getAnimeInfo = async(title) =>{
       })
     })));
 
+    return Promise.all(promises);
+
   }catch(err){
     console.log(err)
   }
-
-  return Promise.all(promises);
-
-};
-
-const getAllAnimes = async () =>{
-
-  let data = await homgot(`${BASE_URL}/api/animes/list`, { parse: true })
-
-  return data.map(item => ({
-    index: item[0],
-    animeId: item[3],
-    title: item[1],
-    id: item[2],
-    type: item[4]
-  }));
 
 };
 
@@ -240,8 +173,8 @@ const downloadLinksByEpsId = async(id) =>{
   let urls = [];
 
   try{
-    const table = $table.html();
-    const data = await urlify(table).then(res => { return res; });
+
+    const data = await urlify($table.html()).then(res => { return res; });
     const tempUrls = [];
     data.map(baseUrl => tempUrls.push(baseUrl.split('"')[0]));
     tempUrls.map(url => decodeURL(url).toString().split('?s=')[1]);
@@ -253,11 +186,12 @@ const downloadLinksByEpsId = async(id) =>{
       });
     });
 
+    return Promise.all(urls);
+
   }catch(err){
     console.log(err);
   }
 
-  return Promise.all(urls);
 };
 
 module.exports = {

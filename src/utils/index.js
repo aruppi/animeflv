@@ -30,7 +30,7 @@ const getInfo = async (html, options) => {
     let synopsis = $element.find('div.Description p').eq(1).text().trim();
     let rating = $element.find('div.Description p span.Vts').text();
 
-    promises.push(animeEpisodesHandler(id).then(async extra => ({
+    promises.push(animeInfo(id).then(async extra => ({
       id: id || null,
       title: title || null,
       poster: await imageUrlToBase64(poster) || null,
@@ -49,13 +49,11 @@ const getInfo = async (html, options) => {
 
 };
 
-const animeEpisodesHandler = async(id) =>{
+const animeInfo = async(id, index) =>{
 
-  try{
+  try {
 
-    let $
-    let options = { scrapy: true }
-    $ = await homgot(`${BASE_URL}/${id}`,options)
+    let $ = await homgot(`${BASE_URL}/${id}`, { scrapy: true })
 
     const scripts = $('script');
     const anime_info_ids = [];
@@ -64,11 +62,11 @@ const animeEpisodesHandler = async(id) =>{
     const genres = [];
     let listByEps;
 
-    let animeTitle = $('body div.Wrapper div.Body div div.Ficha.fchlt div.Container h2.Title').text();
-    let poster = `${BASE_URL}` + $('body div div div div div aside div.AnimeCover div.Image figure img').attr('src')
-    const banner = poster.replace('covers' , 'banners').trim();
-    let synopsis = $('body div div div div div main section div.Description p').text().trim();
-    let rating = $('body div div div.Ficha.fchlt div.Container div.vtshr div.Votes span#votes_prmd').text();
+    const animeTitle = $('body div.Wrapper div.Body div div.Ficha.fchlt div.Container h2.Title').text();
+    const poster = `${BASE_URL}` + $('body div div div div div aside div.AnimeCover div.Image figure img').attr('src')
+    const banner = poster.replace('covers', 'banners').trim();
+    const synopsis = $('body div div div div div main section div.Description p').text().trim();
+    const rating = $('body div div div.Ficha.fchlt div.Container div.vtshr div.Votes span#votes_prmd').text();
     const debut = $('body div.Wrapper div.Body div div.Container div.BX.Row.BFluid.Sp20 aside.SidebarA.BFixed p.AnmStts').text();
     const type = $('body div.Wrapper div.Body div div.Ficha.fchlt div.Container span.Type').text()
 
@@ -82,11 +80,9 @@ const animeEpisodesHandler = async(id) =>{
       type: type,
     })
 
-    $('main.Main section.WdgtCn nav.Nvgnrs a').each((index , element) =>{
-      const $element = $(element);
-      const genre = $element.attr('href').split('=')[1] || null;
-      genres.push(genre);
-    });
+    $('main.Main section.WdgtCn nav.Nvgnrs a').each((index, element) =>
+        genres.push($(element).attr('href').split('=')[1] || null)
+    );
 
     Array.from({length: scripts.length} , (v , k) =>{
       const $script = $(scripts[k]);
@@ -102,109 +98,24 @@ const animeEpisodesHandler = async(id) =>{
         anime_eps_data.push(eps_data);
       }
     });
-    const AnimeThumbnailsId = anime_info_ids[0].split(',')[0].split('"')[1];
+
+    const AnimeThumbnailsId = index;
     const animeId = id.split('anime/')[1];
 
     let nextEpisodeDate
-
-    if (Object.keys(JSON.parse(JSON.stringify(anime_info_ids[0])).length === 4)) {
-      nextEpisodeDate = Object.values(JSON.parse(JSON.stringify(anime_info_ids[0])))[3]
+    if (JSON.parse(JSON.stringify(anime_info_ids[0])).split('\"').length === 9) {
+      nextEpisodeDate = JSON.parse(JSON.stringify(anime_info_ids[0])).split("\"")[7]
     } else {
       nextEpisodeDate = null
     }
 
     const amimeTempList = [];
-    for(const [key , value] of Object.entries(anime_eps_data)){
-      let episode = anime_eps_data[key].map(x => x[0]);
-      let episodeId = anime_eps_data[key].map(x => x[1]);
-      amimeTempList.push(episode , episodeId);
-    }
-    const animeListEps = [{nextEpisodeDate: nextEpisodeDate}];
-    Array.from({length: amimeTempList[1].length} , (v , k) =>{
-      let data = amimeTempList.map(x => x[k]);
-      let episode = data[0];
-      let id = data[1];
-      let imagePreview = `${BASE_EPISODE_IMG_URL}${AnimeThumbnailsId}/${episode}/th_3.jpg`
-      let link = `${id}/${animeId}-${episode}`
-      // @ts-ignore
-      animeListEps.push({
-        episode: episode,
-        id: link,
-        imagePreview: imagePreview
-      })
-    })
-
-    listByEps = animeListEps;
-
-    return {listByEps , genres , animeExtraInfo};
-  }catch(err){
-    console.error(err)
-  }
-};
-
-const animeflvInfo = async(id, index) =>{
-
-  try {
-
-    let $ = await homgot(`${BASE_URL}/anime/${id}`, { scrapy: true });
-
-    const scripts = $('script');
-    const anime_info_ids = [];
-    const anime_eps_data = [];
-    const animeExtraInfo = [];
-    const genres = [];
-    let listByEps;
-
-    let poster = `${BASE_URL}` + $('body div div div div div aside div.AnimeCover div.Image figure img').attr('src')
-    let banner = poster.replace('covers', 'banners').trim();
-    let synopsis = $('body div div div div div main section div.Description p').text().trim();
-    let rating = $('body div div div.Ficha.fchlt div.Container div.vtshr div.Votes span#votes_prmd').text();
-    let debut = $('body div.Wrapper div.Body div div.Container div.BX.Row.BFluid.Sp20 aside.SidebarA.BFixed p.AnmStts').text();
-    let type = $('body div.Wrapper div.Body div div.Ficha.fchlt div.Container span.Type').text()
-
-    animeExtraInfo.push({
-      poster: poster,
-      banner: banner,
-      synopsis: synopsis,
-      rating: rating,
-      debut: debut,
-      type: type,
-    })
-
-    $('main.Main section.WdgtCn nav.Nvgnrs a').each((index, element) =>
-        genres.push($(element).attr('href').split('=')[1] || null)
-    );
-
-    Array.from({length: scripts.length}, (v, k) => {
-      const $script = $(scripts[k]);
-      const contents = $script.html();
-      if ((contents || '').includes('var anime_info = [')) {
-        anime_info_ids.push(JSON.parse(contents.split('var anime_info = ')[1].split(';\n')[0]));
-      }
-      if ((contents || '').includes('var episodes = [')) {
-        anime_eps_data.push(JSON.parse(contents.split('var episodes = ')[1].split(';')[0]));
-      }
-    });
-
-    const AnimeThumbnailsId = index;
-    const animeId = id;
-    let nextEpisodeDate
-
-    if (anime_info_ids.length > 0) {
-      if (anime_info_ids[0].length === 4) {
-        nextEpisodeDate = anime_info_ids[0][3]
-      } else {
-        nextEpisodeDate = null
-      }
-    }
-
-    const amimeTempList = [];
-    for (const [key, value] of Object.entries(anime_eps_data)) {
+    for (const [key] of Object.entries(anime_eps_data)) {
       let episode = anime_eps_data[key].map(x => x[0]);
       let episodeId = anime_eps_data[key].map(x => x[1]);
       amimeTempList.push(episode, episodeId);
     }
-    const animeListEps = [{nextEpisodeDate: nextEpisodeDate}];
+    const listEps = [{nextEpisodeDate: nextEpisodeDate}];
     Array.from({length: amimeTempList[1].length}, (v, k) => {
       let data = amimeTempList.map(x => x[k]);
       let episode = data[0];
@@ -212,69 +123,80 @@ const animeflvInfo = async(id, index) =>{
       let imagePreview = `${BASE_EPISODE_IMG_URL}${AnimeThumbnailsId}/${episode}/th_3.jpg`
       let link = `${id}/${animeId}-${episode}`
 
-      animeListEps.push({
+      listEps.push({
         episode: episode,
         id: link,
         imagePreview: imagePreview
       })
     })
 
-    listByEps = animeListEps;
+    listByEps = listEps
 
-    return {listByEps, genres, animeExtraInfo};
+    return {listByEps , genres , animeExtraInfo};
 
-  } catch (err) {
-    console.error(err)
+  } catch (e) {
+    console.log(e)
   }
 
 };
 
 const animeExtraInfo = async(title) =>{
 
-  const res = await homgot(`${BASE_JIKA_URL}search/anime?q=${title}`,{ parse: true })
-  const matchAnime = res.results.filter(x => x.title === title);
-  const malId = matchAnime[0].mal_id;
+  const matchAnime = await getMALid(title)
 
-  if(typeof malId === 'undefined') return null;
+  try {
 
-  const data = await homgot(`${BASE_JIKA_URL}anime/${malId}`, { parse: true })
-  const body = Array(data);
-  const promises = [];
+    if(matchAnime !== null) {
+      const data = await homgot(`${BASE_JIKA_URL}anime/${matchAnime.mal_id}`, { parse: true })
+      return Array(data).map(doc => ({
+            malid: doc.mal_id,
+            titleJapanese: doc.title_japanese,
+            source: doc.source,
+            totalEpisodes: doc.episodes,
+            status: doc.status,
+            aired:{
+              from: doc.aired.from,
+              to: doc.aired.to,
+              string: doc.aired.string
+            },
+            duration: doc.duration,
+            rank: doc.rank,
+            popularity: doc.popularity,
+            members: doc.members,
+            favorites: doc.favorites,
+            premiered: doc.premiered,
+            broadcast: doc.broadcast,
+            producers:{
+              names: doc.producers.map(x => x.name)
+            },
+            licensors:{
+              names: doc.licensors.map(x => x.name)
+            },
+            studios:{
+              names: doc.studios.map(x => x.name)
+            },
+            openingThemes: doc.opening_themes,
+            endingThemes: doc.ending_themes
+          })
+      );
+    }
+  } catch (err) {
+    console.log(err)
+  }
 
-  body.map(doc =>{
-    promises.push({
-      malid: doc.mal_id,
-      titleJapanese: doc.title_japanese,
-      source: doc.source,
-      totalEpisodes: doc.episodes,
-      status: doc.status,
-      aired:{
-        from: doc.aired.from,
-        to: doc.aired.to,
-        string: doc.aired.string
-      },
-      duration: doc.duration,
-      rank: doc.rank,
-      popularity: doc.popularity,
-      members: doc.members,
-      favorites: doc.favorites,
-      premiered: doc.premiered,
-      broadcast: doc.broadcast,
-      producers:{
-        names: doc.producers.map(x => x.name)
-      },
-      licensors:{
-        names: doc.licensors.map(x => x.name)
-      },
-      studios:{
-        names: doc.studios.map(x => x.name)
-      },
-      openingThemes: doc.opening_themes,
-      endingThemes: doc.ending_themes
-    });
-  });
+};
 
-  return Promise.all(promises);
+const getAllAnimes = async () =>{
+
+  let data = await homgot(`${BASE_URL}/api/animes/list`, { parse: true })
+
+  return data.map(item => ({
+    index: item[0],
+    animeId: item[3],
+    title: item[1],
+    id: item[2],
+    type: item[4]
+  }));
 
 };
 
@@ -283,20 +205,33 @@ const imageUrlToBase64 = async (url) => {
   return img.rawBody.toString('base64');
 };
 
+const getMALid = async(title) =>{
+
+  const res = await homgot(`${BASE_JIKA_URL}search/anime?q=${title}`,{ parse: true })
+  const matchAnime = res.results.find(x => x.title === title);
+
+  if(typeof matchAnime === 'undefined') {
+    return null;
+  } else {
+    return matchAnime;
+  }
+
+};
+
 const urlify = async(text) =>{
   const urls = [];
-  const urlRegex = /(https?:\/\/[^\s]+)/g;
-  text.replace(urlRegex , (url) =>{
+  text.replace(/(https?:\/\/[^\s]+)/g , (url) =>{
     urls.push(url)
   });
-  return Promise.all(urls);
+  return urls;
 };
 
 module.exports = {
   getInfo,
-  animeEpisodesHandler,
-  animeflvInfo,
+  animeInfo,
   animeExtraInfo,
+  getAllAnimes,
   imageUrlToBase64,
+  getMALid,
   urlify
 }
