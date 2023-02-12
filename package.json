@@ -58,7 +58,7 @@
     "compose-middleware": "^5.0.1",
     "cors": "^2.8.5",
     "express": "^4.17.1",
-    "got": "^11.8.0",
+    "got": "^12.5.3",
     "helmet": "^4.1.1",
     "tough-cookie": "^4.0.0",
     "urldecode": "^1.0.1"
